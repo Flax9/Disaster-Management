@@ -226,8 +226,28 @@
                 const result = await response.json();
 
                 if (result.status === 'success') {
-                    // Inject hasil AI ke dalam DOM
-                    warningBox.innerHTML = `<p class="text-gray-800 dark:text-gray-100 text-base font-medium leading-relaxed mb-4">"${result.warning}"</p>`;
+                    const aiStatus = result.warning.status_bahaya;
+                    const aiMessage = result.warning.pesan_peringatan_anti_panik;
+                    
+                    // Deteksi warna berdasarkan keyword status untuk UX
+                    let bgColor = "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800";
+                    if (aiStatus.toUpperCase().includes("MERAH") || aiStatus.toUpperCase().includes("AWAS")) {
+                        bgColor = "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 border-red-200 dark:border-red-800";
+                    } else if (aiStatus.toUpperCase().includes("ORANYE") || aiStatus.toUpperCase().includes("SIAGA")) {
+                        bgColor = "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-800";
+                    } else if (aiStatus.toUpperCase().includes("KUNING") || aiStatus.toUpperCase().includes("WASPADA")) {
+                        bgColor = "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 border-yellow-200 dark:border-yellow-800";
+                    }
+
+                    // Inject hasil AI ke dalam DOM dengan styling status yang jelas
+                    warningBox.innerHTML = `
+                        <div class="mb-4">
+                            <span class="inline-block px-3 py-1 text-xs font-bold rounded-full border ${bgColor} mb-3 shadow-sm">
+                                <i class="fa-solid fa-triangle-exclamation mr-1"></i> STATUS: ${aiStatus}
+                            </span>
+                            <p class="text-gray-800 dark:text-gray-100 text-base font-medium leading-relaxed">"${aiMessage}"</p>
+                        </div>
+                    `;
                 } else {
                     warningBox.innerHTML = `<p class="text-red-500 text-sm font-bold">Gagal memuat instruksi AI: ${result.message}</p>`;
                 }

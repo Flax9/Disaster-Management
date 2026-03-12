@@ -40,12 +40,12 @@ class Emergency extends BaseController
         }
 
         // Kirim raw data cuaca tersebut ke "Otak AI" kita
-        $warningMessage = $this->aiService->generateEarlyWarning($weatherData);
+        $warningData = $this->aiService->generateEarlyWarning($weatherData);
 
-        if ($warningMessage) {
+        if ($warningData && isset($warningData['status_bahaya']) && isset($warningData['pesan_peringatan_anti_panik'])) {
             return $this->response->setJSON([
                 'status' => 'success',
-                'warning' => $warningMessage
+                'warning' => $warningData
             ]);
         }
 

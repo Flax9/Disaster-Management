@@ -24,12 +24,31 @@ class AIService
      */
     public function generateEarlyWarning($weatherData)
     {
-        // System Prompt 1
-        $systemInstruction = "Anda adalah \"SiagaNusa\", asisten AI siaga bencana yang sangat ahli dan berwenang. Tugas utama Anda adalah menerjemahkan data mentah cuaca/bencana (seperti curah hujan, kecepatan angin, atau peringatan geologis) menjadi instruksi evakuasi yang singkat, jelas, menenangkan, dan menyelamatkan nyawa masyarakat umum.\n\nAturan ketat:\n1. Gunakan bahasa Indonesia yang mudah dipahami, tidak kaku, namun tegas.\n2. Maksimal panjang balasan adalah 3 kalimat pendek dan padat.\n3. Kalimat pertama: Status siaga yang jelas (misalnya: [WASPADA], [BAHAYA], atau [SIAGA]).\n4. Kalimat kedua: Penjelasan singkat tentang ancaman dan waktu kejadian (jika ada).\n5. Kalimat ketiga: Instruksi paling prioritas/langkah langsung yang harus dilakukan penyelematan mandiri (Actionable).\n6. Jangan gunakan kata-kata yang memicu kepanikan buta, fokus pada solusi.";
+        // System Prompt 1 (Injeksi Aturan Jurnal Akademis)
+        $systemInstruction = "Anda adalah \"SiagaNusa\", asisten AI siaga bencana yang berwenang. Anda bertugas mengevaluasi data curah hujan dan kecepatan angin real-time berdasarkan panduan: \"AI for Disaster Resilience\" (Narayana, 2025) & BMKG.\n\n" .
+                             "ATURAN MUTLAK PENENTUAN STATUS:\n" .
+                             "1. Jika curah_hujan_saat_ini > 100 mm ATAU kecepatan_angin > 40 km/jam, tetapkan status: \"MERAH (AWAS)\".\n" .
+                             "2. Jika curah_hujan_saat_ini 50 - 100 mm ATAU kecepatan_angin > 25 km/jam, tetapkan status: \"ORANYE (SIAGA)\".\n" .
+                             "3. Di bawah angka tersebut, tetapkan status: \"KUNING (WASPADA)\" atau \"HIJAU (AMAN)\" sesuai keparahan visual.\n\n" .
+                             "ATURAN OUTPUT:\n" .
+                             "1. KEMBALIKAN HANYA FORMAT JSON MURNI. Tanpa awalan/akhiran apapun.\n" .
+                             "2. Struktur JSON:\n" .
+                             "{\n" .
+                             "  \"status_bahaya\": \"Teks Status sesuai aturan mutlak di atas\",\n" .
+                             "  \"pesan_peringatan_anti_panik\": \"Max 2 kalimat instruksi evakuasi/persiapan yang singkat, ramah, dan actionable tanpa memicu kepanikan.\"\n" .
+                             "}";
 
         $userPrompt = "Data Cuaca/Bencana Terkini:\n" . json_encode($weatherData);
 
-        return $this->callGeminiAPI($systemInstruction, $userPrompt);
+        // Memaksa output JSON (true)
+        $response = $this->callGeminiAPI($systemInstruction, $userPrompt, true);
+        
+        if ($response) {
+            $response = str_replace(['```json', '```'], '', $response);
+            return json_decode(trim($response), true);
+        }
+        
+        return null;
     }
 
     /**

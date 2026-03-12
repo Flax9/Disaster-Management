@@ -21,10 +21,10 @@ Saat terjadi bencana, masyarakat sering kali panik, sulit membaca data cuaca men
 Aplikasi ini menggunakan pendekatan *Prompt Engineering* tinggi di sisi server (`app/Libraries/AIService.php`) melalui 2 Endpoint utama:
 
 ### 1. AI Early Warning (`GET /api/warning`)
-**Konsep:** Menerjemahkan data teknis cuaca/bencana menjadi kalimat evakuasi (Actionable) ramah manusia.
+**Konsep:** Menerjemahkan data teknis cuaca/bencana menjadi kalimat evakuasi (Actionable) ramah manusia yang didasarkan pada **Jurnal Akademis**.
 - **Input:** Titik koordinat Lokasi (*Lat/Lng*) dikonversi menjadi data satelit cuaca *real-time* via OpenMeteo (Curah hujan, kecepatan angin, elevasi, dll).
-- **Proses AI:** Gemini disuntik dengan *System Prompt* ketat untuk bertindak sebagai otoritas kebencanaan yang menenangkan, menganalisis data meteorologi tersebut, dan merangkumnya dalam **Maksimal 3 Kalimat**.
-- **Output:** Status Siaga / Saran berlindung / Rute Evakuasi.
+- **Proses AI:** Gemini disuntik dengan *System Prompt* ketat untuk bertindak sebagai otoritas kebencanaan yang menenangkan, menganalisis data meteorologi tersebut berdasarkan ***"AI for Disaster Resilience" (Surya Narayana, 2025)***. Status MERAH (AWAS) hanya dikeluarkan jika hujan >100mm/hari atau angin >40km/jam.
+- **Output JSON:** `status_bahaya` (Warna indikator UI) dan `pesan_peringatan_anti_panik` (Maksimal 2 kalimat instruksi).
 
 ### 2. Emergency NLP Triage (`POST /api/report`)
 **Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal).
@@ -32,6 +32,11 @@ Aplikasi ini menggunakan pendekatan *Prompt Engineering* tinggi di sisi server (
 - **Proses AI:** Gemini dipaksa melalui *JSON response format* untuk hanya mengembalikan struktur data khusus.
 - **Output JSON:** `location`, `status`, level `priority` (LOW/MEDIUM/HIGH/CRITICAL), dan *array* `specific_needs` (contoh: ["Perahu Karet", "P3K"]).
 - Frontend Leaflet.js kemudian mem-parsing JSON ini untuk menggambar **Red Pin Darurat Berdenyut** di peta secara dinamis.
+
+### 3. Panic-Proof Accessibility (WhatsApp-Style Voice Input)
+**Konsep:** Di saat darurat, mengetik menjadi sangat lambat dan rawan *typo*. SiagaNusa mengadopsi interaksi yang sudah menjadi "Muscle Memory" masyarakat Indonesia, yakni **Voice Note WhatsApp**. 
+- Fitur "Hold to Talk" *seamless* (Tahan tombol hijau membulat untuk merekam suara, yang memunculkan UI *soundwave* animasi, dan *timer*).
+- Otomatis mengubah suara menjadi teks Indonesia via Web Speech API, sangat membantu lansia atau pengguna yang sedang mengevakuasi barang berharga.
 
 ## ⚙️ How to Run Locally
 
