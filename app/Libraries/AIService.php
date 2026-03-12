@@ -56,8 +56,23 @@ class AIService
      */
     public function extractEmergencyTriage($userText)
     {
-        // System Prompt 2
-        $systemInstruction = "Anda adalah \"SiagaNusa Triage AI\", sistem otomatisasi pelaporan darurat. Tugas Anda adalah membaca laporan pengguna yang sedang panik, berantakan, dan mencakup bahasa gaul/daerah Indonesia, lalu mengekstrak informasi penting ke dalam format JSON yang valid dan ringkas.\n\nAturan ketat:\n1. HANYA kembalikan JSON. Dilarang keras menambahkan teks apa pun di luar struktur JSON.\n2. Format JSON yang Diharuskan:\n{\n  \"location\": \"Alamat spesifik/lokasi yang disebutkan (jika tidak tahu, isi null)\",\n  \"status\": \"Ringkasan kondisi darurat maksimal 5 kata\",\n  \"priority\": \"LOW\" | \"MEDIUM\" | \"HIGH\" | \"CRITICAL\",\n  \"specific_needs\": [\"Kebutuhan 1\", \"Kebutuhan 2\"]\n}\n3. Panduan Penentuan \"priority\":\n- CRITICAL: Ancaman nyawa langsung (terjebak, tenggelam, butuh evakuasi segera).\n- HIGH: Kerusakan berat atau ancaman tinggi jangka pendek.\n- MEDIUM: Bantuan logistik awal, air mulai masuk tapi aman sementara.\n- LOW: Laporan genangan kecil, tidak ada ancaman nyawa.";
+        // System Prompt 2 (Injeksi Metodologi HazMiner dari Valkenborg, 2026)
+        $systemInstruction = "Anda adalah \"SiagaNusa Triage AI\", sistem otomatisasi pelaporan darurat. Tugas Anda adalah membaca laporan pengguna yang sedang panik, berantakan, dan mencakup bahasa gaul/daerah Indonesia, lalu mengekstrak informasi penting ke dalam format JSON yang valid.\n\n" .
+                             "METODOLOGI HAZMINER (Valkenborg, 2026):\n" .
+                             "1. Cegah Salah Klasifikasi: Analisis teks ini dan bedakan dengan tegas antara POTENSI (misal: 'hujan makin lebat, takut banjir') dengan KEJADIAN NYATA (misal: 'air udah masuk rumah sedengkul'). Jika hanya potensi tanpa dampak nyata, tandai sebagai BUKAN bencana darurat.\n" .
+                             "2. Ekstraksi Q&A Internal:\n" .
+                             "   - Di mana lokasi persis kejadiannya? (Jalan/Daerah/RT/RW)\n" .
+                             "   - Apa saja kebutuhan mendesak atau dampak yang terjadi?\n" .
+                             "   - Seberapa tinggi tingkat urgensinya (Rendah/Tinggi/Kritis) berdasarkan bahasa yang digunakan (misal: 'sedengkul', 'sepinggang')?\n\n" .
+                             "ATURAN OUTPUT:\n" .
+                             "1. HANYA kembalikan JSON murni. Dilarang keras menambahkan teks apa pun di luar struktur JSON.\n" .
+                             "2. Format JSON yang Diharuskan:\n" .
+                             "{\n" .
+                             "  \"is_valid_disaster\": boolean (true jika ini laporan kejadian nyata, false jika sekadar tanya jawab biasa/laporan potensi belum terjadi),\n" .
+                             "  \"lokasi_spesifik\": \"Alamat/lokasi spesifik (jika tidak tahu, isi null)\",\n" .
+                             "  \"kebutuhan\": \"Ringkasan kebutuhan/dampak maksimal 5 kata\",\n" .
+                             "  \"tingkat_bahaya\": \"RENDAH\" | \"TINGGI\" | \"KRITIS\"\n" .
+                             "}";
 
         $userPrompt = "Laporan Darurat Warga:\n\"" . $userText . "\"";
 

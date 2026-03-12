@@ -301,12 +301,16 @@
                 if (result.status === 'success') {
                     const aiData = result.data;
                     
-                    // Plot "Red Pin" di peta
-                    plotEmergencyMarker(userLat, userLng, aiData);
-
-                    // Bersihkan form
-                    textArea.value = '';
-                    alert("Laporan berhasil diproses AI dan di-plot di peta!");
+                    // Implementasi Valkenborg (2026) HazMiner: Cegah Salah Klasifikasi (Potensi vs Kejadian Nyata)
+                    if (aiData.is_valid_disaster === false) {
+                        alert("Sistem (HazMiner AI) mendeteksi bahwa pesan Anda bersifat potensi/pertanyaan dan BUKAN kejadian darurat nyata yang memerlukan evakuasi. Laporan dibatalkan untuk mencegah kepanikan palsu.");
+                    } else {
+                        // Plot "Red Pin" di peta untuk kejadian nyata
+                        plotEmergencyMarker(userLat, userLng, aiData);
+                        // Bersihkan form
+                        textArea.value = '';
+                        alert("Laporan tervalidasi sebagai Darurat Nyata & berhasil di-plot di peta!");
+                    }
                 } else {
                     alert("Gagal: " + result.message);
                 }
@@ -333,28 +337,24 @@
             });
 
             // Ubah sedikit koordinat agar pin tidak persis menumpuk dengan lokasi user
-            // Di dunia nyata, AI mungkin mengekstrak koordinat dari nama jalan
             const offsetLat = lat + (Math.random() - 0.5) * 0.005;
             const offsetLng = lng + (Math.random() - 0.5) * 0.005;
 
-            // Warnai priority
+            // Warnai priority berdasarkan Tingkat Bahaya HazMiner
             let badgeColor = 'bg-gray-500';
-            if (aiData.priority === 'CRITICAL') badgeColor = 'bg-red-700 animate-pulse';
-            if (aiData.priority === 'HIGH') badgeColor = 'bg-orange-600';
-            if (aiData.priority === 'MEDIUM') badgeColor = 'bg-yellow-500';
+            if (aiData.tingkat_bahaya === 'KRITIS') badgeColor = 'bg-red-700 animate-pulse';
+            if (aiData.tingkat_bahaya === 'TINGGI') badgeColor = 'bg-orange-600';
+            if (aiData.tingkat_bahaya === 'RENDAH') badgeColor = 'bg-yellow-500';
 
             const popupHtml = `
                 <div class="p-1 min-w-[200px]">
                     <div class="flex justify-between items-start mb-2">
                         <span class="text-xs font-bold text-white px-2 py-0.5 rounded ${badgeColor}">
-                            ${aiData.priority || 'UNKNOWN'}
+                            ${aiData.tingkat_bahaya || 'UNKNOWN'}
                         </span>
                     </div>
-                    <p class="font-bold text-gray-900 mb-1 leading-tight text-sm">${aiData.status || 'Kondisi Darurat'}</p>
-                    <p class="text-xs text-gray-600 mb-2"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> ${aiData.location || 'Lokasi tidak spesifik'}</p>
-                    ${aiData.specific_needs && aiData.specific_needs.length > 0 
-                        ? `<div class="bg-gray-100 p-2 rounded text-xs text-gray-800"><b>Butuh:</b> ${aiData.specific_needs.join(', ')}</div>` 
-                        : ''}
+                    <p class="font-bold text-gray-900 mb-1 leading-tight text-sm">${aiData.kebutuhan || 'Kondisi Darurat'}</p>
+                    <p class="text-xs text-gray-600 mb-2"><i class="fa-solid fa-location-dot text-red-500 mr-1"></i> ${aiData.lokasi_spesifik || 'Lokasi tidak spesifik'}</p>
                     <hr class="my-2 border-gray-300">
                     <p class="text-[10px] text-gray-500 italic">" ${aiData.original_text} "</p>
                 </div>

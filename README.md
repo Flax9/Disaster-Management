@@ -27,11 +27,11 @@ Aplikasi ini menggunakan pendekatan *Prompt Engineering* tinggi di sisi server (
 - **Output JSON:** `status_bahaya` (Warna indikator UI) dan `pesan_peringatan_anti_panik` (Maksimal 2 kalimat instruksi).
 
 ### 2. Emergency NLP Triage (`POST /api/report`)
-**Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal).
+**Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal) serta membedakan potensi dan kejadian nyata menggunakan metodologi ***HazMiner (Valkenborg, 2026)***.
 - **Input:** Teks acak warga (Contoh: *"Tolong min air tiba-tiba naik sedengkul di rumah saya di Perumahan Anggrek Blok B!! Kakek saya stroke kejebak di kamar butuh banget perahu karet..."*).
-- **Proses AI:** Gemini dipaksa melalui *JSON response format* untuk hanya mengembalikan struktur data khusus.
-- **Output JSON:** `location`, `status`, level `priority` (LOW/MEDIUM/HIGH/CRITICAL), dan *array* `specific_needs` (contoh: ["Perahu Karet", "P3K"]).
-- Frontend Leaflet.js kemudian mem-parsing JSON ini untuk menggambar **Red Pin Darurat Berdenyut** di peta secara dinamis.
+- **Proses AI:** Menggunakan *Internal Q&A* untuk mencegah klasifikasi Spam/Disinformasi. AI menganalisis apakah laporan ini adalah *"Potensi Bencana"* atau *"Kejadian Darurat Nyata"*.
+- **Output JSON:** `is_valid_disaster` (Boolean Spam Trap), `lokasi_spesifik`, `kebutuhan`, dan `tingkat_bahaya` (RENDAH/TINGGI/KRITIS).
+- Frontend Leaflet.js memvalidasi JSON. Jika sah (`is_valid_disaster: true`), peta memunculkan **Red Pin Darurat Berdenyut** dengan detail cerdas. Jika tidak valid, pengiriman dibatalkan dengan menayangkan *alert*.
 
 ### 3. Panic-Proof Accessibility (WhatsApp-Style Voice Input)
 **Konsep:** Di saat darurat, mengetik menjadi sangat lambat dan rawan *typo*. SiagaNusa mengadopsi interaksi yang sudah menjadi "Muscle Memory" masyarakat Indonesia, yakni **Voice Note WhatsApp**. 
