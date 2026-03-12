@@ -27,7 +27,7 @@ Aplikasi ini menggunakan pendekatan *Prompt Engineering* tinggi di sisi server (
 - **Output JSON:** `status_bahaya` (Warna indikator UI) dan `pesan_peringatan_anti_panik` (Maksimal 2 kalimat instruksi).
 
 ### 2. Emergency NLP Triage (`POST /api/report`)
-**Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal) serta membedakan potensi dan kejadian nyata menggunakan metodologi ***HazMiner (Valkenborg, 2026)***.
+**Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal) serta membedakan potensi dan kejadian nyata menggunakan metodologi jurnal ***"Unravelling information on impactful geo-hydrological hazard events with HazMiner, a multilingual text mining method developed through a global scale coverage application" (Valkenborg, 2026)***.
 - **Input:** Teks acak warga (Contoh: *"Tolong min air tiba-tiba naik sedengkul di rumah saya di Perumahan Anggrek Blok B!! Kakek saya stroke kejebak di kamar butuh banget perahu karet..."*).
 - **Proses AI:** Menggunakan *Internal Q&A* untuk mencegah klasifikasi Spam/Disinformasi. AI menganalisis apakah laporan ini adalah *"Potensi Bencana"* atau *"Kejadian Darurat Nyata"*.
 - **Output JSON:** `is_valid_disaster` (Boolean Spam Trap), `lokasi_spesifik`, `kebutuhan`, dan `tingkat_bahaya` (RENDAH/TINGGI/KRITIS).
