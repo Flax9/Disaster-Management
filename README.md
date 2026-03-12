@@ -23,7 +23,7 @@ Aplikasi ini menggunakan pendekatan *Prompt Engineering* tinggi di sisi server (
 ### 1. AI Early Warning (`GET /api/warning`)
 **Konsep:** Menerjemahkan data teknis cuaca/bencana menjadi kalimat evakuasi (Actionable) ramah manusia yang didasarkan pada **Jurnal Akademis**.
 - **Input:** Titik koordinat Lokasi (*Lat/Lng*) dikonversi menjadi data satelit cuaca *real-time* via OpenMeteo (Curah hujan, kecepatan angin, elevasi, dll).
-- **Proses AI:** Gemini disuntik dengan *System Prompt* ketat untuk bertindak sebagai otoritas kebencanaan yang menenangkan, menganalisis data meteorologi tersebut berdasarkan ***"AI for Disaster Resilience" (Surya Narayana, 2025)***. Status MERAH (AWAS) hanya dikeluarkan jika hujan >100mm/hari atau angin >40km/jam.
+- **Proses AI:** Gemini disuntik dengan *System Prompt* yang memadukan tiga landasan parameter cuaca: Curah Hujan berbasis *AI for Disaster Resilience (Surya Narayana, 2025)* yang dipadukan dengan intensitas resmi **BMKG**, serta Kecepatan Angin berbasis *Jurnal BEMAS (2024)*. Status peringatan dikeluarkan terstruktur mulai dari AWAS (MERAH) untuk angin >=40 km/jam, WASPADA (ORANYE) untuk 30-39 km/jam, SIAGA (KUNING) untuk 20-29 km/jam, hingga AMAN (HIJAU).
 - **Output JSON:** `status_bahaya` (Warna indikator UI) dan `pesan_peringatan_anti_panik` (Maksimal 2 kalimat instruksi).
 
 ### 2. Emergency NLP Triage (`POST /api/report`)

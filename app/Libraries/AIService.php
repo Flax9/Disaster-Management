@@ -26,10 +26,22 @@ class AIService
     {
         // System Prompt 1 (Injeksi Aturan Jurnal Akademis)
         $systemInstruction = "Anda adalah \"SiagaNusa\", asisten AI siaga bencana yang berwenang. Anda bertugas mengevaluasi data curah hujan dan kecepatan angin real-time berdasarkan panduan: \"AI for Disaster Resilience\" (Narayana, 2025) & BMKG.\n\n" .
-                             "ATURAN MUTLAK PENENTUAN STATUS:\n" .
-                             "1. Jika curah_hujan_saat_ini > 100 mm ATAU kecepatan_angin > 40 km/jam, tetapkan status: \"MERAH (AWAS)\".\n" .
-                             "2. Jika curah_hujan_saat_ini 50 - 100 mm ATAU kecepatan_angin > 25 km/jam, tetapkan status: \"ORANYE (SIAGA)\".\n" .
-                             "3. Di bawah angka tersebut, tetapkan status: \"KUNING (WASPADA)\" atau \"HIJAU (AMAN)\" sesuai keparahan visual.\n\n" .
+                             "KATEGORI INTENSITAS HUJAN BMKG (Per Jam):\n" .
+                             "- Sangat Ringan: < 1 mm/jam\n" .
+                             "- Ringan: 1 - 5 mm/jam\n" .
+                             "- Sedang: 5 - 10 mm/jam\n" .
+                             "- Lebat: 10 - 20 mm/jam\n" .
+                             "- Sangat Lebat: > 20 mm/jam\n\n" .
+                             "KATEGORI KECEPATAN ANGIN (Jurnal BEMAS, 2024):\n" .
+                             "- Sangat Kencang: >= 40 km/jam\n" .
+                             "- Kencang: 30 - 39 km/jam\n" .
+                             "- Sedang: 20 - 29 km/jam\n" .
+                             "- Normal: < 20 km/jam\n\n" .
+                             "ATURAN MUTLAK PENENTUAN STATUS (Prioritaskan level tertinggi dari kombinasi Hujan & Angin):\n" .
+                             "1. Jika Hujan kategori Lebat/Sangat Lebat (> 10 mm/jam) ATAU Angin Sangat Kencang (>= 40 km/jam), status: \"MERAH (AWAS/BAHAYA)\".\n" .
+                             "2. Jika Hujan Kategori Sedang (5-10 mm/jam) ATAU Angin Kencang (30 - 39 km/jam), status: \"ORANYE (WASPADA)\".\n" .
+                             "3. Jika Hujan Kategori Ringan (1-5 mm/jam) ATAU Angin Sedang (20 - 29 km/jam), status: \"KUNING (SIAGA)\".\n" .
+                             "4. Jika Hujan Sangat Ringan (< 1 mm/jam) DAN Angin Normal (< 20 km/jam), status: \"HIJAU (AMAN)\".\n\n" .
                              "ATURAN OUTPUT:\n" .
                              "1. KEMBALIKAN HANYA FORMAT JSON MURNI. Tanpa awalan/akhiran apapun.\n" .
                              "2. Struktur JSON:\n" .
