@@ -27,10 +27,10 @@ Aplikasi ini menggunakan pendekatan *Prompt Engineering* tinggi di sisi server (
 - **Output JSON:** `status_bahaya` (Warna indikator UI) dan `pesan_peringatan_anti_panik` (Maksimal 2 kalimat instruksi).
 
 ### 2. Emergency NLP Triage (`POST /api/report`)
-**Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal) serta membedakan potensi dan kejadian nyata menggunakan metodologi jurnal ***"Unravelling information on impactful geo-hydrological hazard events with HazMiner, a multilingual text mining method developed through a global scale coverage application" (Valkenborg, 2026)***.
+**Konsep:** Mengekstrak informasi terstruktur dari laporan kepanikan warga yang berantakan (menggunakan dialek lokal/informal) serta membedakan potensi dan kejadian nyata menggunakan metodologi jurnal ***"Unravelling information on impactful geo-hydrological hazard events with HazMiner, a multilingual text mining method developed through a global scale coverage application" (Valkenborg, 2026)***. Ditambah perlindungan privasi berbasis jurnal ***"Security and Privacy Challenges of Participatory Sensing in Natural Disaster Management" (Alswailim, 2023)***.
 - **Input:** Teks acak warga (Contoh: *"Tolong min air tiba-tiba naik sedengkul di rumah saya di Perumahan Anggrek Blok B!! Kakek saya stroke kejebak di kamar butuh banget perahu karet..."*).
-- **Proses AI:** Menggunakan *Internal Q&A* untuk mencegah klasifikasi Spam/Disinformasi. AI menganalisis apakah laporan ini adalah *"Potensi Bencana"* atau *"Kejadian Darurat Nyata"*.
-- **Output JSON:** `is_valid_disaster` (Boolean Spam Trap), `lokasi_spesifik`, `kebutuhan`, dan `tingkat_bahaya` (RENDAH/TINGGI/KRITIS).
+- **Proses AI:** Menggunakan *Internal Q&A* (HazMiner) untuk mencegah klasifikasi Spam/Disinformasi. AI menganalisis apakah laporan ini adalah *"Potensi Bencana"* atau *"Kejadian Darurat Nyata"*. Selain itu, AI melakukan *Data Anonymization* & *Minimization* untuk menghapus PII (nama, telepon) dari laporan publik.
+- **Output JSON:** `is_valid_disaster` (Boolean Spam Trap), `lokasi_spesifik`, `kebutuhan` (tanpa identitas), dan `tingkat_bahaya` (RENDAH/TINGGI/KRITIS).
 - Frontend Leaflet.js memvalidasi JSON. Jika sah (`is_valid_disaster: true`), peta memunculkan **Red Pin Darurat Berdenyut** dengan detail cerdas. Jika tidak valid, pengiriman dibatalkan dengan menayangkan *alert*.
 
 ### 3. Panic-Proof Accessibility (WhatsApp-Style Voice Input)

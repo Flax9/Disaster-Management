@@ -56,7 +56,7 @@ class AIService
      */
     public function extractEmergencyTriage($userText)
     {
-        // System Prompt 2 (Injeksi Metodologi HazMiner dari Valkenborg, 2026)
+        // System Prompt 2 (Injeksi Metodologi HazMiner dari Valkenborg, 2026 & Privasi dari Alswailim, 2023)
         $systemInstruction = "Anda adalah \"SiagaNusa Triage AI\", sistem otomatisasi pelaporan darurat. Tugas Anda adalah membaca laporan pengguna yang sedang panik, berantakan, dan mencakup bahasa gaul/daerah Indonesia, lalu mengekstrak informasi penting ke dalam format JSON yang valid.\n\n" .
                              "METODOLOGI HAZMINER (Valkenborg, 2026):\n" .
                              "1. Cegah Salah Klasifikasi: Analisis teks ini dan bedakan dengan tegas antara POTENSI (misal: 'hujan makin lebat, takut banjir') dengan KEJADIAN NYATA (misal: 'air udah masuk rumah sedengkul'). Jika hanya potensi tanpa dampak nyata, tandai sebagai BUKAN bencana darurat.\n" .
@@ -64,13 +64,16 @@ class AIService
                              "   - Di mana lokasi persis kejadiannya? (Jalan/Daerah/RT/RW)\n" .
                              "   - Apa saja kebutuhan mendesak atau dampak yang terjadi?\n" .
                              "   - Seberapa tinggi tingkat urgensinya (Rendah/Tinggi/Kritis) berdasarkan bahasa yang digunakan (misal: 'sedengkul', 'sepinggang')?\n\n" .
+                             "PROTOKOL KEAMANAN PRIVASI (Alswailim, 2023):\n" .
+                             "1. Data Anonymization: HAPUS secara paksa semua nama orang, nomor telepon, atau NIK/identitas pribadi (PII) dari teks yang dilaporkan. Jangan pernah memasukkan identitas pelapor ke dalam hasil ekstraksi JSON.\n" .
+                             "2. Data Minimization: Fokus hanya pada ekstraksi parameter krusial (lokasi, tingkat bahaya, dan kebutuhan evakuasi/medis). Abaikan curhatan, keluhan politik, atau teks emosional lain yang tidak esensial untuk penyelamatan nyawa.\n\n" .
                              "ATURAN OUTPUT:\n" .
                              "1. HANYA kembalikan JSON murni. Dilarang keras menambahkan teks apa pun di luar struktur JSON.\n" .
                              "2. Format JSON yang Diharuskan:\n" .
                              "{\n" .
                              "  \"is_valid_disaster\": boolean (true jika ini laporan kejadian nyata, false jika sekadar tanya jawab biasa/laporan potensi belum terjadi),\n" .
                              "  \"lokasi_spesifik\": \"Alamat/lokasi spesifik (jika tidak tahu, isi null)\",\n" .
-                             "  \"kebutuhan\": \"Ringkasan kebutuhan/dampak maksimal 5 kata\",\n" .
+                             "  \"kebutuhan\": \"Ringkasan kebutuhan/dampak maksimal 5 kata (Tanpa Nama/Identitas)\",\n" .
                              "  \"tingkat_bahaya\": \"RENDAH\" | \"TINGGI\" | \"KRITIS\"\n" .
                              "}";
 
